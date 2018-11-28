@@ -68,7 +68,15 @@ bool DataLayer<Dtype>::Skip() {
 
 template<typename Dtype>
 void DataLayer<Dtype>::Next() {
-  cursor_->Next();
+  if(this->layer_param_.data_param().rand_skip()>0){
+//      LOG_IF(INFO, Caffe::root_solver())
+//      << "RAND_SKIP....";
+    int skip = caffe_rng_rand()%this->layer_param_.data_param().rand_skip();
+    while(skip-- >0){
+      cursor_->Next();
+    }
+  }
+  else cursor_->Next();
   if (!cursor_->valid()) {
     LOG_IF(INFO, Caffe::root_solver())
         << "Restarting data prefetching from start.";
