@@ -117,6 +117,10 @@ class SigmoidCrossEntropyLossLayer : public LossLayer<Dtype> {
   bool has_ignore_label_;
   /// The label indicating that an instance should be ignored.
   int ignore_label_;
+  float positive_weight;
+  bool has_positive_weight;
+  bool has_neg_focal_;
+  bool neg_focal_;
   /// How to normalize the loss.
   LossParameter_NormalizationMode normalization_;
   Dtype normalizer_;

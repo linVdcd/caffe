@@ -21,6 +21,16 @@ void SigmoidCrossEntropyLossLayer<Dtype>::LayerSetUp(
   if (has_ignore_label_) {
     ignore_label_ = this->layer_param_.loss_param().ignore_label();
   }
+  has_positive_weight = this->layer_param_.loss_param().has_positive_weight();
+  if(has_positive_weight)
+  {
+      positive_weight = this->layer_param_.loss_param().positive_weight();
+  }
+  has_neg_focal_ = this->layer_param_.loss_param().has_neg_focal();
+  if(has_neg_focal_)
+  {
+      neg_focal_ = this->layer_param_.loss_param().neg_focal();
+  }
   if (this->layer_param_.loss_param().has_normalization()) {
     normalization_ = this->layer_param_.loss_param().normalization();
   } else if (this->layer_param_.loss_param().has_normalize()) {

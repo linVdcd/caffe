@@ -36,6 +36,27 @@ __global__ void SigmoidCrossEntropyLossIgnoreDiffGPU(const int count,
   }
 }
 
+template <typename Dtype>
+__global__ void SigmoidCrossEntropyLossPositiveDiffGPU(const int count,
+    const float positive_weight,const int inner_num, const Dtype* target, Dtype* diff) {
+    CUDA_KERNEL_LOOP(i, count) {
+        const int target_value = static_cast<int>(target[i]);
+        if (target_value == 1 && (i%inner_num)!=(inner_num-1)) {
+           diff[i] *=(positive_weight+1.) ;
+        }
+    }
+}
+template <typename Dtype>
+__global__ void SigmoidCrossEntropyLossNegFocalDiffGPU(const int count, const Dtype* target, Dtype* diff) {
+    CUDA_KERNEL_LOOP(i, count) {
+            const int target_value = static_cast<int>(target[i]);
+            if (target_value == 0) {
+                float p =-diff[i];
+                diff[i] =2.*(2.*(1-p)*log(1-p)-p)*p*p ;
+            }
+        }
+}
+
 
 template <typename Dtype>
 void SigmoidCrossEntropyLossLayer<Dtype>::Forward_gpu(
@@ -95,6 +116,14 @@ void SigmoidCrossEntropyLossLayer<Dtype>::Backward_gpu(
       // NOLINT_NEXT_LINE(whitespace/operators)
       SigmoidCrossEntropyLossIgnoreDiffGPU<Dtype><<<CAFFE_GET_BLOCKS(count),
         CAFFE_CUDA_NUM_THREADS>>>(count, ignore_label_, target, bottom_diff);
+    }
+    if (has_positive_weight){
+      SigmoidCrossEntropyLossPositiveDiffGPU<Dtype><<<CAFFE_GET_BLOCKS(count),
+              CAFFE_CUDA_NUM_THREADS>>>(count,positive_weight,inner_num_,target,bottom_diff);
+    }
+    if(neg_focal_){
+        SigmoidCrossEntropyLossNegFocalDiffGPU<Dtype><<<CAFFE_GET_BLOCKS(count),
+                CAFFE_CUDA_NUM_THREADS>>>(count, target, bottom_diff);
     }
     // Scale down gradient
     Dtype loss_weight = top[0]->cpu_diff()[0] / normalizer_;
