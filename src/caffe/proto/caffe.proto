@@ -403,6 +403,7 @@ message LayerParameter {
   optional MemoryDataParameter memory_data_param = 119;
   optional MVNParameter mvn_param = 120;
   optional ParameterParameter parameter_param = 145;
+  optional PermuteParameter permute_param = 200;
   optional PoolingParameter pooling_param = 121;
   optional PowerParameter power_param = 122;
   optional PReLUParameter prelu_param = 131;
@@ -421,6 +422,7 @@ message LayerParameter {
   optional ThresholdParameter threshold_param = 128;
   optional TileParameter tile_param = 138;
   optional WindowDataParameter window_data_param = 129;
+
 }
 
 // Message that stores parameters used to apply transformation
@@ -920,6 +922,10 @@ message MVNParameter {
 message ParameterParameter {
   optional BlobShape shape = 1;
 }
+message PermuteParameter {
+  repeated uint32 order = 1;
+}
+
 
 message PoolingParameter {
   enum PoolMethod {
