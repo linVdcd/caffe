@@ -89,7 +89,9 @@ class DataTransformer {
    *    input blob. It can be part of top blob's data.
    */
   void Transform(Blob<Dtype>* input_blob, Blob<Dtype>* transformed_blob);
-
+  void TransformImgAndSeg(const std::vector<cv::Mat>& cv_img_seg,
+                          Blob<Dtype>* transformed_data_blob, Blob<Dtype>* transformed_label_blob,
+                          const int ignore_label);
   /**
    * @brief Infers the shape of transformed_blob will have when
    *    the transformation is applied to the data.
@@ -139,6 +141,7 @@ class DataTransformer {
   virtual int Rand(int n);
 
   void Transform(const Datum& datum, Dtype* transformed_data);
+
   // Tranformation parameters
   TransformationParameter param_;
 
